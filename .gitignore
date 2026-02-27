@@ -1,0 +1,9 @@
+node_modules/
+venv/
+*.log
+.DS_Store
+dist/
+
+# Ignore the specific large files
+DEMO/intermediate_results/preprocessed_data.csv
+DEMO/Hospital_Inpatient_Discharges__SPARCS_De-Identified___2022_20241021.csv
