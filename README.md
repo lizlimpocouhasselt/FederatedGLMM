@@ -44,6 +44,44 @@ git status -sb
 git diff --cached --name-only
 ```
 
+## Quick Start
+
+Run all commands from the repository root.
+
+### DEMO pipeline
+
+Run in this order:
+
+1. `DEMO/scripts_and_functions/data_provider.R`
+2. `DEMO/scripts_and_functions/da_genps.R`
+3. `DEMO/scripts_and_functions/da_est.R`
+
+```bash
+Rscript DEMO/scripts_and_functions/data_provider.R
+Rscript DEMO/scripts_and_functions/da_genps.R
+Rscript DEMO/scripts_and_functions/da_est.R
+```
+
+### SIMULATION pipeline
+
+Run in this order:
+
+1. `SIMULATION/scripts/simdata.R`
+2. `SIMULATION/scripts/compute_summary.R`
+3. `SIMULATION/scripts/pseudodata_2ndmom.R`, `SIMULATION/scripts/pseudodata_3rdmom.R`, `SIMULATION/scripts/pseudodata_4thmom.R`
+4. `SIMULATION/scripts/estimates.R`
+5. `SIMULATION/scripts/preds.R`
+
+```bash
+Rscript SIMULATION/scripts/simdata.R
+Rscript SIMULATION/scripts/compute_summary.R
+Rscript SIMULATION/scripts/pseudodata_2ndmom.R
+Rscript SIMULATION/scripts/pseudodata_3rdmom.R
+Rscript SIMULATION/scripts/pseudodata_4thmom.R
+Rscript SIMULATION/scripts/estimates.R
+Rscript SIMULATION/scripts/preds.R
+```
+
 ## Sync Hygiene
 
 Before pushing, confirm that staged files are mostly code/config/docs and not bulk generated outputs.
