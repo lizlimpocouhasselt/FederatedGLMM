@@ -1,4 +1,4 @@
-fn_compute_summary <- function(iter, m, uniform_cluster_size, seed, simdata){
+fn_compute_summary <- function(iter, m, uniform_cluster_size, seed, simdata, include_x4_x5 = FALSE){
   
   # Prepare functions to compute moments
   mv_moment_3_4_bypair <- function(a,b,n){
@@ -25,7 +25,7 @@ fn_compute_summary <- function(iter, m, uniform_cluster_size, seed, simdata){
   
   # Prepare summary statistics (data provider task) ------------------
   # Identify numeric variables
-  numeric_var_names <- c('x1', 'y', 'log_yfac')
+  numeric_var_names <- if (isTRUE(include_x4_x5)) c('x1', 'x4', 'y', 'log_yfac') else c('x1', 'y', 'log_yfac')
   # numeric_var_names <- c('x1', 'y')
   
   
@@ -38,8 +38,9 @@ fn_compute_summary <- function(iter, m, uniform_cluster_size, seed, simdata){
   })
   
   mean_cov <- lapply(1:m, function(group_num){
-    x3.vals <- setdiff(names(group_data_design_df[[group_num]]), c('x1', 'x2', 'log_yfac', 'y', 'g'))
-    type <- c('num', 'bin', rep('bin', length(x3.vals)), 'num','num')
+    excluded <- if (isTRUE(include_x4_x5)) c('x1', 'x2', 'x4', 'x5', 'log_yfac', 'y', 'g') else c('x1', 'x2', 'log_yfac', 'y', 'g')
+    x3.vals <- setdiff(names(group_data_design_df[[group_num]]), excluded)
+    type <- if (isTRUE(include_x4_x5)) c('num', 'bin', rep('bin', length(x3.vals)), 'num', 'bin', 'num', 'num') else c('num', 'bin', rep('bin', length(x3.vals)), 'num','num')
     df <- group_data_design_df[[group_num]]
     df <- df[, names(df) != 'g']
     sumdf1 <- data.frame(

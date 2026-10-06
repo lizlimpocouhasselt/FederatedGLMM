@@ -1,0 +1,14 @@
+# Core R package dependencies for Federated GLMM Codes_and_Data
+# Install example:
+# install.packages(scan('R_packages.txt', what = 'character', comment.char = '#'))
+
+dplyr
+lme4
+MASS
+matrixStats
+pracma
+randtoolbox
+stringr
+tictoc
+tidyr
+tidyverse

@@ -13,7 +13,7 @@ library(tidyr)
 library(tidyverse)
 
 # # Call functions
-source(file.path(getwd(), 'SIMULATION', 'scripts','soft_poisson.R'))
+source(file.path(getwd(), 'R_common', 'soft_poisson.R'))
 
 # Load the parameter settings
 par_settings <- read.csv(file.path("SIMULATION", "intermediate_results", "poisson", "par_settings.csv"))

@@ -11,7 +11,7 @@ library(dplyr)
 library(tidyr)
 
 # # Call functions
-source(file.path(getwd(), 'SIMULATION', 'scripts','soft_poisson.R'))
+source(file.path(getwd(), 'R_common', 'soft_poisson.R'))
 
 # family = 'poisson'
 

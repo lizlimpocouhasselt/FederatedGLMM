@@ -8,9 +8,11 @@ This repository contains the code and selected data assets for the Federated GLM
   - `scripts_and_functions/`: demo scripts and reusable functions
   - `intermediate_results/`: generated demo artifacts (mostly `.RData`)
 - `SIMULATION/`: simulation pipeline
-  - `scripts/`: simulation scripts and reusable functions
+  - `steps/`: simulation pipeline entry scripts (run order)
+  - `scripts/`: reusable simulation functions and helper modules
   - `intermediate_results/`: generated simulation artifacts (large, reproducible)
   - `par_settings.csv`: simulation parameter settings
+- `R_common/`: helper functions shared by both DEMO and SIMULATION
 - `Figures/`: scripts and outputs for manuscript figures
   - `scripts_and_functions/`: figure generation code
   - `outputs/`: generated figure files
@@ -19,7 +21,7 @@ This repository contains the code and selected data assets for the Federated GLM
 
 Treat these as source-of-truth assets that should be versioned and reviewed:
 
-- R scripts in `DEMO/scripts_and_functions/`, `SIMULATION/scripts/`, and `Figures/scripts_and_functions/`
+- R scripts in `DEMO/scripts_and_functions/`, `SIMULATION/steps/`, `SIMULATION/scripts/`, `R_common/`, and `Figures/scripts_and_functions/`
 - Small configuration files such as `SIMULATION/par_settings.csv`
 - Documentation and policies in the repository root
 
@@ -66,20 +68,20 @@ Rscript DEMO/scripts_and_functions/da_est.R
 
 Run in this order:
 
-1. `SIMULATION/scripts/simdata.R`
-2. `SIMULATION/scripts/compute_summary.R`
-3. `SIMULATION/scripts/pseudodata_2ndmom.R`, `SIMULATION/scripts/pseudodata_3rdmom.R`, `SIMULATION/scripts/pseudodata_4thmom.R`
-4. `SIMULATION/scripts/estimates.R`
-5. `SIMULATION/scripts/preds.R`
+1. `SIMULATION/steps/simdata.R`
+2. `SIMULATION/steps/compute_summary.R`
+3. `SIMULATION/steps/pseudodata_2ndmom.R`, `SIMULATION/steps/pseudodata_3rdmom.R`, `SIMULATION/steps/pseudodata_4thmom.R`
+4. `SIMULATION/steps/estimates.R`
+5. `SIMULATION/steps/preds.R`
 
 ```bash
-Rscript SIMULATION/scripts/simdata.R
-Rscript SIMULATION/scripts/compute_summary.R
-Rscript SIMULATION/scripts/pseudodata_2ndmom.R
-Rscript SIMULATION/scripts/pseudodata_3rdmom.R
-Rscript SIMULATION/scripts/pseudodata_4thmom.R
-Rscript SIMULATION/scripts/estimates.R
-Rscript SIMULATION/scripts/preds.R
+Rscript SIMULATION/steps/simdata.R
+Rscript SIMULATION/steps/compute_summary.R
+Rscript SIMULATION/steps/pseudodata_2ndmom.R
+Rscript SIMULATION/steps/pseudodata_3rdmom.R
+Rscript SIMULATION/steps/pseudodata_4thmom.R
+Rscript SIMULATION/steps/estimates.R
+Rscript SIMULATION/steps/preds.R
 ```
 
 ## Sync Hygiene

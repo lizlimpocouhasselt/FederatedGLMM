@@ -6,9 +6,9 @@
 library(lme4)
 library(dplyr)
 library(tidyr)
-source(file.path('DEMO', 'scripts_and_functions', 'soft_binomial.R'))
-source(file.path('DEMO', 'scripts_and_functions', 'soft_binomInitialize.R'))
-source(file.path('DEMO', 'scripts_and_functions', 'soft_poisson.R'))
+source(file.path('R_common', 'soft_binom_initialize.R'))
+source(file.path('R_common', 'soft_binomial.R'))
+source(file.path('R_common', 'soft_poisson.R'))
 
 
 # Count number of groups

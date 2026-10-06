@@ -5,7 +5,7 @@ rm(list=ls(all=TRUE))
 library(lme4)
 library(dplyr)
 library(tidyr)
-source(file.path(getwd(), "SIMULATION", "scripts", "soft_poisson.R"))
+source(file.path(getwd(), "R_common", "soft_poisson.R"))
 
 par_settings <- read.csv(file.path(getwd(), 'SIMULATION', 'par_settings.csv'))
 

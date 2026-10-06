@@ -1,11 +1,11 @@
-soft_binomial <- function (link = "logit") 
+soft_binomial <- function (link = "logit", round_counts = TRUE)
 {
   linktemp <- substitute(link)
-  if (!is.character(linktemp)) 
+  if (!is.character(linktemp))
     linktemp <- deparse(linktemp)
   okLinks <- c("logit", "probit", "cloglog", "cauchit", "log")
   family <- "soft_binomial"
-  if (linktemp %in% okLinks) 
+  if (linktemp %in% okLinks)
     stats <- make.link(linktemp)
   else if (is.character(link)) {
     stats <- make.link(link)
@@ -14,43 +14,42 @@ soft_binomial <- function (link = "logit")
   else {
     if (inherits(link, "link-glm")) {
       stats <- link
-      if (!is.null(stats$name)) 
+      if (!is.null(stats$name))
         linktemp <- stats$name
     }
     else {
-      stop(gettextf("link \"%s\" not available for %s family; available links are %s", 
-                    linktemp, family, paste(sQuote(okLinks), collapse = ", ")), 
+      stop(gettextf("link \"%s\" not available for %s family; available links are %s",
+                    linktemp, family, paste(sQuote(okLinks), collapse = ", ")),
            domain = NA)
     }
   }
   variance <- function(mu) mu * (1 - mu)
-  validmu <- function(mu) all(is.finite(mu)) && all(mu > 0 & 
+  validmu <- function(mu) all(is.finite(mu)) && all(mu > 0 &
                                                       mu < 1)
-  # dev.resids <- function(y, mu, wt) .Call(C_binomial_dev_resids, 
-  #                                         y, mu, wt)
   dev.resids <- function(y, mu, wt) -2 * wt * (y * log(mu) + (1 - y) * log(1 - mu))
-  # aic <- function(y, n, mu, wt, dev) {
-  #   m <- if (any(n > 1)) n else wt
-  #   -2 * sum(ifelse(m > 0, (wt/m), 0) * dbinom(round(m * 
-  #                                                      y), round(m), mu, log = TRUE))
-  # }
   aic <- function(y, n, mu, wt, dev) {
     m <- if (any(n > 1)) n else wt
+    if (isTRUE(round_counts)) {
+      yy <- round(m * y)
+      mm <- round(m)
+    } else {
+      yy <- m * y
+      mm <- m
+    }
     -2 * sum(ifelse(m > 0, (wt/m), 0) *
-               (m*y * log(mu) + (m - m*y) * log(1-mu))
-             )
+               (yy * log(mu) + (mm - yy) * log(1 - mu)))
   }
   simfun <- function(object, nsim) {
     ftd <- fitted(object)
     n <- length(ftd)
     ntot <- n * nsim
     wts <- object$prior.weights
-    if (any(wts%%1 != 0)) 
+    if (any(wts%%1 != 0))
       stop("cannot simulate from non-integer prior.weights")
     if (!is.null(m <- object$model)) {
       y <- model.response(m)
       if (is.factor(y)) {
-        yy <- factor(1 + rbinom(ntot, size = 1, prob = ftd), 
+        yy <- factor(1 + rbinom(ntot, size = 1, prob = ftd),
                      labels = levels(y))
         split(yy, rep(seq_len(nsim), each = n))
       }
@@ -69,9 +68,9 @@ soft_binomial <- function (link = "logit")
     else rbinom(ntot, size = wts, prob = ftd)/wts
   }
 
-  structure(list(family = family, link = linktemp, linkfun = stats$linkfun, 
-                 linkinv = stats$linkinv, variance = variance, dev.resids = dev.resids, 
-                 aic = aic, mu.eta = stats$mu.eta, initialize = soft_binomInitialize(family), 
-                 validmu = validmu, valideta = stats$valideta, simulate = simfun, 
+  structure(list(family = family, link = linktemp, linkfun = stats$linkfun,
+                 linkinv = stats$linkinv, variance = variance, dev.resids = dev.resids,
+                 aic = aic, mu.eta = stats$mu.eta, initialize = soft_binomInitialize(family),
+                 validmu = validmu, valideta = stats$valideta, simulate = simfun,
                  dispersion = 1), class = "family")
 }

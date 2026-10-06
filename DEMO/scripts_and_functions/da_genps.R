@@ -13,6 +13,7 @@ source(file.path(getwd(), 'DEMO', 'scripts_and_functions', 'extract_unique_momen
 source(file.path(getwd(), 'DEMO', 'scripts_and_functions', 'obj.R'))
 source(file.path(getwd(), 'DEMO', 'scripts_and_functions', 'lsqnonlin_2.R'))
 source(file.path(getwd(), 'DEMO', 'scripts_and_functions', 'construct_hankel.R'))
+source(file.path(getwd(), 'R_common', 'mvrnorm2.R'))
 
 
 # Count number of groups

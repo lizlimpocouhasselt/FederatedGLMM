@@ -6,6 +6,9 @@ This policy keeps the repository organized, reproducible, and fast to sync.
 
 - `DEMO/`: demo data workflow and demo analysis code.
 - `SIMULATION/`: simulation code, parameter settings, and generated simulation results.
+  - `steps/`: run-order scripts for the pipeline.
+  - `scripts/`: reusable simulation functions.
+- `R_common/`: shared helpers used by multiple pipelines.
 - `Figures/`: scripts and outputs used to create manuscript figures.
 
 ## 2) What Must Be Tracked
@@ -32,7 +35,10 @@ The `.gitignore` file enforces these defaults.
 - New reusable code goes in:
   - `DEMO/scripts_and_functions/`
   - `SIMULATION/scripts/`
+  - `R_common/`
   - `Figures/scripts_and_functions/`
+- Pipeline entry points go in:
+  - `SIMULATION/steps/`
 - New generated files go in the relevant `intermediate_results/` or `outputs/` folder.
 - Do not place generated files in script folders.
 

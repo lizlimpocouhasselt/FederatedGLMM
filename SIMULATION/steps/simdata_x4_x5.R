@@ -6,7 +6,7 @@
 rm(list=ls(all=TRUE)) 
 
 # Call functions
-source(file.path('SIMULATION', 'scripts', 'fn_simdata_x4_x5.R'))
+source(file.path('SIMULATION', 'scripts', 'fn_simdata.R'))
 
 # Set parameters based on real SPARCS dataset
 x_pars <- list(x1_norm_mean = 3150.149,
@@ -22,7 +22,7 @@ lapply(1:nrow(par_settings), function(row){
     m <- par_settings$m[row]
     uniform_cluster_size <- par_settings$uniform_cluster_size[row]
     seed <- par_settings$seed[row]
-    simdata <- fn_simdata_glmm(iter, m, uniform_cluster_size, seed, x_pars) 
+    simdata <- fn_simdata_glmm(iter, m, uniform_cluster_size, seed, x_pars, include_x4_x5 = TRUE)
     filename_save <- file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', 'simdata_x4_x5', sprintf("simdata_%04d_%04d_%04d", iter, m, uniform_cluster_size))
     save(simdata, file = sprintf("%s.RData", filename_save))
 })

@@ -10,7 +10,7 @@ library(matrixStats)
 library(dplyr)
 
 # Call functions
-source(file.path('SIMULATION', 'scripts', 'fn_compute_summary_x4_x5.R'))
+source(file.path('SIMULATION', 'scripts', 'fn_compute_summary.R'))
 
 # Load parameter settings
 par_settings <- read.csv(file.path('SIMULATION', 'par_settings.csv'))
@@ -23,7 +23,7 @@ lapply(1:nrow(par_settings), function(row){
 
     # Load data
     load(file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', 'simdata_x4_x5', sprintf('simdata_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
-    summary_info <- fn_compute_summary(iter, m, uniform_cluster_size, seed, simdata) 
+    summary_info <- fn_compute_summary(iter, m, uniform_cluster_size, seed, simdata, include_x4_x5 = TRUE)
     mean_cov <- summary_info[[1]]
     var_cov_mat <- summary_info[[2]]
     mv_moment_3_4_bypair_df <- summary_info[[3]]
