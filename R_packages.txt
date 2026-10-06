@@ -1,4 +1,8 @@
-# Core R package dependencies for Federated GLMM Codes_and_Data
+# Core R package dependencies for Federated GLMM Codes_and_Data.
+# This source manifest is used to populate the project renv environment.
+# Prefer using the renv lockfile for reproducible installation:
+#   renv::restore()
+#   renv::snapshot(type = "all", prompt = FALSE)
 # Install example:
 # install.packages(scan('R_packages.txt', what = 'character', comment.char = '#'))
 

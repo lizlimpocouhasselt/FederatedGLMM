@@ -84,6 +84,27 @@ Rscript SIMULATION/steps/estimates.R
 Rscript SIMULATION/steps/preds.R
 ```
 
+## Environment management
+
+This project uses `renv` for a reproducible R library. The package list in `R_packages.txt` is the source manifest; use the lockfile for restores and updates.
+
+```bash
+cd Codes_and_Data
+Rscript -e 'renv::restore()'
+Rscript -e 'renv::snapshot(type = "all", prompt = FALSE)'
+```
+
+## Runner script
+
+The full SIMULATION pipeline can be run from a single entry point. The baseline pipeline runs by default, and the x4_x5 variant can be added with a toggle.
+
+```bash
+cd Codes_and_Data
+Rscript SIMULATION/steps/run_pipeline.R
+Rscript SIMULATION/steps/run_pipeline.R --include-x4-x5
+Rscript SIMULATION/steps/run_pipeline.R --dry-run --include-x4-x5
+```
+
 ## Sync Hygiene
 
 Before pushing, confirm that staged files are mostly code/config/docs and not bulk generated outputs.
