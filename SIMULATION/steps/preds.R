@@ -16,7 +16,7 @@ source(file.path(getwd(), 'R_common', 'soft_poisson.R'))
 # family = 'poisson'
 
 # # Load the parameter settings
-par_settings <- read.csv(file.path("SIMULATION", "intermediate_results", "poisson", "par_settings.csv"))
+par_settings <- read.csv(file.path("SIMULATION", "par_settings.csv"))
 
 # seed <- par_settings$seed[row]
 
