@@ -64,6 +64,8 @@ Rscript DEMO/scripts_and_functions/da_genps.R
 Rscript DEMO/scripts_and_functions/da_est.R
 ```
 
+`data_provider.R` streams the raw SPARCS CSV from Google Drive with `rclone cat` (no local copy) only when `DEMO/intermediate_results/preprocessed_data.csv` is missing or `DEMO_REBUILD=1`. One-time setup: `brew install rclone && rclone config` (Google Drive remote named `gdrive`). Override the source with `SPARCS_RCLONE_REMOTE` (rclone path) or `SPARCS_CSV_PATH` (local file).
+
 ### SIMULATION pipeline
 
 Run in this order:
