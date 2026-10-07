@@ -7,6 +7,10 @@
 # install.packages(scan('R_packages.txt', what = 'character', comment.char = '#'))
 
 dplyr
+fastDummies
+DBI
+data.table
+duckdb
 lme4
 MASS
 matrixStats
