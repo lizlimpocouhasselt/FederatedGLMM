@@ -18,10 +18,13 @@ run_rclone <- function(args) {
     stop("rclone not found. Install it (`brew install rclone`), add a Google Drive remote named 'gdrive' (`rclone config`), or set FGLMM_RCLONE_ROOT.")
   }
 
-  out <- suppressWarnings(system2("rclone", args = args, stdout = TRUE, stderr = TRUE))
+  # system2 does not quote args; the default remote path contains spaces
+  err_file <- tempfile()
+  on.exit(unlink(err_file, force = TRUE), add = TRUE)
+  out <- suppressWarnings(system2("rclone", args = shQuote(args), stdout = TRUE, stderr = err_file))
   status <- attr(out, "status")
   if (!is.null(status) && status != 0L) {
-    msg <- paste(out, collapse = "\n")
+    msg <- paste(c(out, readLines(err_file, warn = FALSE)), collapse = "\n")
     stop(sprintf("rclone command failed (status %s): rclone %s\n%s", status, paste(args, collapse = " "), msg))
   }
   out
