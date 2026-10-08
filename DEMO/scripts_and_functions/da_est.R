@@ -20,10 +20,13 @@ if (.Platform$OS.type == "windows") n_cores <- 1L
 cat(sprintf("[da_est] using %d cores\n", n_cores))
 
 
-# Load pseudo-data (each file is downloaded once, in parallel)
+# Load pseudo-data from Google Drive only; no local copy of ps/ is needed
 ps_dir <- file.path("DEMO", "intermediate_results", "ps")
-all_files <- remote_list(ps_dir)
-cat(sprintf("[da_est] found %d pseudo-data files\n", length(all_files)))
+# Call run_rclone directly: remote_list() hides rclone errors as an empty listing
+all_files <- run_rclone(c("lsf", "--files-only", "--include", "ps_*.RData", remote_path(ps_dir)))
+all_files <- sort(all_files[nzchar(trimws(all_files))])
+if (length(all_files) == 0L) stop("No ps_*.RData files found on Drive at ", remote_path(ps_dir))
+cat(sprintf("[da_est] found %d pseudo-data files on Drive\n", length(all_files)))
 
 ps.ls <- mclapply(all_files, function(file.name) {
   e <- new.env(parent = emptyenv())
