@@ -62,6 +62,71 @@ rclone lsf "$FGLMM_RCLONE_ROOT/DEMO/intermediate_results"
 
 The local `DEMO/intermediate_results` and `SIMULATION/intermediate_results` directories are no longer treated as the source of truth for generated artifacts; the remote Drive mirror is authoritative. Existing local copies can remain in place until you verify the remote contents and delete the local copies manually.
 
+### Drive-backed run examples (rclone pipeline)
+
+These examples show how to run scripts that read/write data on Google Drive through `rclone` and `R_common/remote_store.R`.
+
+1. Set the remote root once per shell session.
+2. Run scripts from `Codes_and_Data` so relative `source()` paths resolve.
+3. Use helper checks to confirm remote inputs/outputs exist.
+
+```bash
+cd Codes_and_Data
+export FGLMM_RCLONE_ROOT='gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data'
+```
+
+Quick connectivity check:
+
+```bash
+rclone lsf --files-only "$FGLMM_RCLONE_ROOT/DEMO/intermediate_results/ps" | head
+Rscript -e "source('R_common/remote_store.R'); print(length(remote_list('DEMO/intermediate_results/ps'))); print(remote_exists('DEMO/intermediate_results/preprocessed_data.csv'))"
+```
+
+Run DEMO with Drive-backed SPARCS streaming (default behavior when no local CSV is set):
+
+```bash
+cd Codes_and_Data
+export FGLMM_RCLONE_ROOT='gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data'
+unset SPARCS_CSV_PATH
+unset SPARCS_RCLONE_REMOTE
+Rscript DEMO/scripts_and_functions/data_provider.R
+Rscript DEMO/scripts_and_functions/da_genps.R
+Rscript DEMO/scripts_and_functions/da_est.R
+```
+
+Force a full rebuild of `preprocessed_data.csv` from Drive (ignore existing remote cache):
+
+```bash
+cd Codes_and_Data
+export FGLMM_RCLONE_ROOT='gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data'
+export DEMO_REBUILD=1
+Rscript DEMO/scripts_and_functions/data_provider.R
+unset DEMO_REBUILD
+```
+
+Override the Drive CSV location explicitly (for a non-default remote path):
+
+```bash
+cd Codes_and_Data
+export FGLMM_RCLONE_ROOT='gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data'
+export SPARCS_RCLONE_REMOTE='gdrive:PhD/Working papers/Federated GLMM/alternate_path/Hospital_Inpatient_Discharges__SPARCS_De-Identified___2022_20241021.csv'
+Rscript DEMO/scripts_and_functions/data_provider.R
+```
+
+Run SIMULATION pipeline with remote `.RData` I/O:
+
+```bash
+cd Codes_and_Data
+export FGLMM_RCLONE_ROOT='gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data'
+Rscript SIMULATION/steps/run_pipeline.R
+```
+
+Check remote outputs after a run:
+
+```bash
+Rscript -e "source('R_common/remote_store.R'); cat('simdata files:', length(remote_list('SIMULATION/intermediate_results/poisson/simdata')), '\n'); cat('ps4 files:', length(remote_list('SIMULATION/intermediate_results/poisson/ps4')), '\n'); cat('pred files:', length(remote_list('SIMULATION/intermediate_results/poisson/preds')), '\n')"
+```
+
 ### DEMO pipeline
 
 Run in this order:
