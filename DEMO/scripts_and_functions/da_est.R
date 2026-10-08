@@ -80,7 +80,7 @@ fits <- list(
   logit.glmm.ps = function() glmer(COVID19_positive ~ scale(Length.of.Stay) + scale(Total.Charges) + Gender_M + Emergency.Department.Indicator_Y + (1|g), data = ps, family = soft_binomial, control = gctl),
   logit.glmm.actual = function() glmer(ifelse(COVID19 == "positive", 1, 0) ~ scale(Length.of.Stay) + scale(Total.Charges) + Gender + Emergency.Department.Indicator + (1|Facility.Name), data = data, family = binomial, control = gctl),
   poi.glmm.actual = function() glmer(Length.of.Stay ~ COVID19 + scale(Total.Charges) + Gender + Emergency.Department.Indicator + (1|Facility.Name), data = data, family = poisson, control = gctl),
-  poi.glmm.ps = function() glmer(Length.of.Stay ~ COVID19_positive + Gender_M + Emergency.Department.Indicator_Y + (1|g), data = ps, family = soft_poisson, control = gctl),
+  poi.glmm.ps = function() glmer(Length.of.Stay ~ COVID19_positive + scale(Total.Charges) + Gender_M + Emergency.Department.Indicator_Y + (1|g), data = ps, family = soft_poisson, control = gctl),
   gau.glmm.actual = function() lmer(scale(Total.Charges) ~ scale(Length.of.Stay) + COVID19 + Gender + Emergency.Department.Indicator + (1|Facility.Name), data = data, control = lctl),
   gau.glmm.ps = function() lmer(scale(Total.Charges) ~ scale(Length.of.Stay) + COVID19_positive + Gender_M + Emergency.Department.Indicator_Y + (1|g), data = ps, control = lctl)
 )
