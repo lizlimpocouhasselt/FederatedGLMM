@@ -5,6 +5,7 @@ venv/
 dist/
 *.Rhistory
 *.RData
+*.rds
 
 # Ignore the specific large files
 DEMO/intermediate_results/preprocessed_data.csv
