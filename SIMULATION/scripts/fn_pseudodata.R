@@ -1,3 +1,5 @@
+source(file.path(getwd(), 'R_common', 'remote_store.R'))
+
 run_pseudodata <- function(moment, input_suffix = "", output_suffix = "") {
   if (!(moment %in% c(2, 3, 4))) {
     stop("moment must be one of 2, 3, or 4")
@@ -28,20 +30,20 @@ run_pseudodata <- function(moment, input_suffix = "", output_suffix = "") {
     uniform_cluster_size <- par_settings$uniform_cluster_size[row]
     seed <- par_settings$seed[row]
 
-    load(file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', mean_cov_dir,
-                   sprintf('mean_cov_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
-    load(file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', var_cov_dir,
-                   sprintf('var_cov_mat_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
+    remote_load(file.path('SIMULATION', 'intermediate_results', 'poisson', mean_cov_dir,
+                          sprintf('mean_cov_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
+    remote_load(file.path('SIMULATION', 'intermediate_results', 'poisson', var_cov_dir,
+                          sprintf('var_cov_mat_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
 
     if (moment >= 3) {
-      load(file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', pair_dir,
-                     sprintf('mv_moment_3_4_bypair_df_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
-      load(file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', by3_dir,
-                     sprintf('mv_moment_3_4_by3_df_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
+      remote_load(file.path('SIMULATION', 'intermediate_results', 'poisson', pair_dir,
+                            sprintf('mv_moment_3_4_bypair_df_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
+      remote_load(file.path('SIMULATION', 'intermediate_results', 'poisson', by3_dir,
+                            sprintf('mv_moment_3_4_by3_df_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
     }
     if (moment == 4) {
-      load(file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', m4_dir,
-                     sprintf('mv_moment_4_df_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
+      remote_load(file.path('SIMULATION', 'intermediate_results', 'poisson', m4_dir,
+                            sprintf('mv_moment_4_df_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
     }
 
     set.seed(seed)
@@ -68,8 +70,8 @@ run_pseudodata <- function(moment, input_suffix = "", output_suffix = "") {
     })
 
     assign(pseudodata_name, pseudodata, envir = .GlobalEnv)
-    filename_save <- file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', output_dir,
+    filename_save <- file.path('SIMULATION', 'intermediate_results', 'poisson', output_dir,
                                sprintf('%s_%04d_%04d_%04d', pseudodata_name, iter, m, uniform_cluster_size))
-    save(list = pseudodata_name, file = sprintf('%s.RData', filename_save))
+    remote_save(list = pseudodata_name, key = filename_save, envir = .GlobalEnv)
   })
 }

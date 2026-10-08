@@ -50,6 +50,18 @@ git diff --cached --name-only
 
 Run all commands from the repository root.
 
+### Remote intermediate storage
+
+Intermediate data sets are now routed through Google Drive via `rclone`. Set the shared remote root with `FGLMM_RCLONE_ROOT` (or accept the default `gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data`). The `rclone` binary must be installed and authenticated before running DEMO or SIMULATION steps.
+
+```bash
+export FGLMM_RCLONE_ROOT='gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data'
+which rclone
+rclone lsf "$FGLMM_RCLONE_ROOT/DEMO/intermediate_results"
+```
+
+The local `DEMO/intermediate_results` and `SIMULATION/intermediate_results` directories are no longer treated as the source of truth for generated artifacts; the remote Drive mirror is authoritative. Existing local copies can remain in place until you verify the remote contents and delete the local copies manually.
+
 ### DEMO pipeline
 
 Run in this order:

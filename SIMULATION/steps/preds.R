@@ -11,6 +11,7 @@ library(dplyr)
 library(tidyr)
 
 # # Call functions
+source(file.path(getwd(), 'R_common', 'remote_store.R'))
 source(file.path(getwd(), 'R_common', 'soft_poisson.R'))
 
 # family = 'poisson'
@@ -41,12 +42,12 @@ lapply(1:nrow(par_settings), function(row){
   uniform_cluster_size <- par_settings$uniform_cluster_size[row]
 
   # Load data
-  load(file.path("SIMULATION", "intermediate_results", "poisson", "simdata", sprintf("simdata_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
-  load(file.path("SIMULATION", "intermediate_results", "poisson", "ps2", sprintf("pseudodata_2ndmom_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
+  remote_load(file.path("SIMULATION", "intermediate_results", "poisson", "simdata", sprintf("simdata_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
+  remote_load(file.path("SIMULATION", "intermediate_results", "poisson", "ps2", sprintf("pseudodata_2ndmom_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
   ps2 <- bind_rows(pseudodata_2ndmom) %>% mutate(across(where(is.numeric), ~replace_na(., 0)))
-  load(file.path("SIMULATION", "intermediate_results", "poisson", "ps3", sprintf("pseudodata_3rdmom_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
+  remote_load(file.path("SIMULATION", "intermediate_results", "poisson", "ps3", sprintf("pseudodata_3rdmom_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
   ps3 <- bind_rows(pseudodata_3rdmom) %>% mutate(across(where(is.numeric), ~replace_na(., 0)))
-  load(file.path("SIMULATION", "intermediate_results", "poisson", "ps4", sprintf("pseudodata_4thmom_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
+  remote_load(file.path("SIMULATION", "intermediate_results", "poisson", "ps4", sprintf("pseudodata_4thmom_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
   ps4 <- bind_rows(pseudodata_4thmom) %>% mutate(across(where(is.numeric), ~replace_na(., 0)))
 
   # Estimate a Poisson mixed model 
@@ -73,5 +74,5 @@ lapply(1:nrow(par_settings), function(row){
 
   # Save
   filename <- file.path("SIMULATION", "intermediate_results", "poisson", "preds", sprintf("preds_%04d_%04d_%04d", iter, m, uniform_cluster_size))
-  save(poi.predictions, file = sprintf("%s.RData", filename))
+  remote_save(poi.predictions, key = filename)
 })

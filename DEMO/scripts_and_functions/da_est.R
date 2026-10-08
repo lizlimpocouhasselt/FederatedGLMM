@@ -6,24 +6,25 @@
 library(lme4)
 library(dplyr)
 library(tidyr)
+source(file.path('R_common', 'remote_store.R'))
 source(file.path('R_common', 'soft_binom_initialize.R'))
 source(file.path('R_common', 'soft_binomial.R'))
 source(file.path('R_common', 'soft_poisson.R'))
 
 
 # Count number of groups
-all_files <- list.files(path = file.path("DEMO", "intermediate_results", "ps"))
+all_files <- remote_list(file.path("DEMO", "intermediate_results", "ps"))
 m <- length(all_files)
 
 # Load pseudo-data
 grp_nums <- unlist(lapply(all_files, function(file.name){
-  load(file.path(getwd(), "DEMO", "intermediate_results", "ps", file.name))
+  remote_load(file.path("DEMO", "intermediate_results", "ps", file.name))
   cat('file ', file.name, ' is loaded\n')
   ps$g[1]
 }))
 
 ps.ls <- lapply(grp_nums, function(grp_num){
-  load(file.path(getwd(), "DEMO", "intermediate_results", "ps", sprintf("ps_%04d.RData", grp_num)))
+  remote_load(file.path("DEMO", "intermediate_results", "ps", sprintf("ps_%04d.RData", grp_num)))
   cat('grp ', grp_num, ' is loaded\n')
   ps
 })
@@ -86,7 +87,7 @@ ci.poi.glmm.ps <- confint(poi.glmm.ps, method = "Wald")
 
 
 # Load actual data
-data <- read.csv(file.path(getwd(), "DEMO", "intermediate_results", "preprocessed_data.csv"), header = T)
+data <- remote_read_csv(file.path("DEMO", "intermediate_results", "preprocessed_data.csv"), header = T)
 grpd_data <- data %>% split(f = as.factor(data$Facility.Name))
 grpd_data <- grpd_data[grp_nums]
 data <- do.call(rbind, grpd_data)

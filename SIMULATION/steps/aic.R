@@ -13,10 +13,11 @@ library(tidyr)
 library(tidyverse)
 
 # # Call functions
+source(file.path(getwd(), 'R_common', 'remote_store.R'))
 source(file.path(getwd(), 'R_common', 'soft_poisson.R'))
 
 # Load the parameter settings
-par_settings <- read.csv(file.path("SIMULATION", "intermediate_results", "poisson", "par_settings.csv"))
+par_settings <- read.csv(file.path("SIMULATION", "par_settings.csv"))
 
 
 # Redefine glm families with no scale to accommodate non-binary or non-integer responses
@@ -38,7 +39,7 @@ mod.selection.df <- sapply(1:nrow(par_settings), function(row){
   uniform_cluster_size <- par_settings$uniform_cluster_size[row]
 
   # Load data
-  load(file.path("SIMULATION", "intermediate_results", "poisson", "aic_x4_x5", sprintf("aic_values_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
+  remote_load(file.path("SIMULATION", "intermediate_results", "poisson", "aic_x4_x5", sprintf("aic_values_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
   # load(file.path("SIMULATION", "intermediate_results", "poisson", "simdata_x4_x5", sprintf("simdata_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
   # load(file.path("SIMULATION", "intermediate_results", "poisson", "ps2_x4_x5", sprintf("pseudodata_2ndmom_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
   # ps2 <- bind_rows(pseudodata_2ndmom) %>% mutate(across(where(is.numeric), ~replace_na(., 0)))

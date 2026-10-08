@@ -8,6 +8,7 @@ library(tictoc)
 library(dplyr)
 library(tidyr)
 library(randtoolbox)
+source(file.path(getwd(), 'R_common', 'remote_store.R'))
 source(file.path(getwd(), 'DEMO', 'scripts_and_functions', 'gen_pseudo.R'))
 source(file.path(getwd(), 'DEMO', 'scripts_and_functions', 'extract_unique_moments.R'))
 source(file.path(getwd(), 'DEMO', 'scripts_and_functions', 'obj.R'))
@@ -17,14 +18,15 @@ source(file.path(getwd(), 'R_common', 'mvrnorm2.R'))
 
 
 # Count number of groups
-all_files <- list.files(path = file.path("DEMO", "intermediate_results", "summary_info"))
+all_files <- remote_list(file.path("DEMO", "intermediate_results", "summary_info"))
 m <- length(all_files)
 
 # In the interest of time, we generated pseudo-data using Vlaams Supercomputer
 lapply(1:m, function(grp_num){
   # I. Load summary data
-  load(file.path("DEMO", "intermediate_results", "summary_info", sprintf("summary_info_%04d.RData", grp_num)))
-  
+  key <- file.path("DEMO", "intermediate_results", "summary_info", sprintf("summary_info_%04d.RData", grp_num))
+  remote_load(key)
+
   # II. Generate pseudo-data
   set.seed(121314)
   ps.ls <- lapply(summary_info, function(summary_info){
@@ -41,5 +43,5 @@ lapply(1:m, function(grp_num){
   ps <- bind_rows(ps.ls) %>% mutate(across(where(is.numeric), ~replace_na(., 0)))
   ps$g <- grp_num
   cat("grp ", grp_num, " is finished")
-  save(ps, file = file.path(getwd(), "DEMO", "intermediate_results", "ps", sprintf("ps_%04d.RData", grp_num))) 
+  remote_save(ps, key = file.path("DEMO", "intermediate_results", "ps", sprintf("ps_%04d.RData", grp_num)))
 })

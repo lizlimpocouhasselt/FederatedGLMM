@@ -12,3 +12,5 @@ DEMO/Hospital_Inpatient_Discharges__SPARCS_De-Identified___2022_20241021.csv
 
 # Ignore generated simulation outputs
 SIMULATION/intermediate_results/
+# Generated DEMO cache
+DEMO/intermediate_results/cache/

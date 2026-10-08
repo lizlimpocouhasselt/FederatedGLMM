@@ -5,6 +5,7 @@ rm(list=ls(all=TRUE))
 library(lme4)
 library(dplyr)
 library(tidyr)
+source(file.path(getwd(), 'R_common', 'remote_store.R'))
 source(file.path(getwd(), "R_common", "soft_poisson.R"))
 
 par_settings <- read.csv(file.path(getwd(), 'SIMULATION', 'par_settings.csv'))
@@ -16,10 +17,10 @@ lapply(1:nrow(par_settings), function(row){
   seed <- par_settings$seed[row]
 
   # Load data
-  load(file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', 'simdata', sprintf('simdata_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
-  load(file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', 'ps2', sprintf('pseudodata_2ndmom_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
-  load(file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', 'ps3', sprintf('pseudodata_3rdmom_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
-  load(file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', 'ps4', sprintf('pseudodata_4thmom_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
+  remote_load(file.path('SIMULATION', 'intermediate_results', 'poisson', 'simdata', sprintf('simdata_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
+  remote_load(file.path('SIMULATION', 'intermediate_results', 'poisson', 'ps2', sprintf('pseudodata_2ndmom_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
+  remote_load(file.path('SIMULATION', 'intermediate_results', 'poisson', 'ps3', sprintf('pseudodata_3rdmom_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
+  remote_load(file.path('SIMULATION', 'intermediate_results', 'poisson', 'ps4', sprintf('pseudodata_4thmom_%04d_%04d_%04d.RData', iter, m, uniform_cluster_size)))
   pseudodata_2ndmom <- bind_rows(pseudodata_2ndmom) %>% mutate(across(where(is.numeric), ~replace_na(., 0)))
   pseudodata_3rdmom <- bind_rows(pseudodata_3rdmom) %>% mutate(across(where(is.numeric), ~replace_na(., 0)))
   pseudodata_4thmom <- bind_rows(pseudodata_4thmom) %>% mutate(across(where(is.numeric), ~replace_na(., 0)))
@@ -78,14 +79,14 @@ lapply(1:nrow(par_settings), function(row){
                                      summary(mod.result.ps4)$coefficients['x34','Estimate'],
                                      summary(mod.result.ps4)$coefficients['x35','Estimate'])} else{rep(NA, 8)}
                                      )
-  filename_save <- file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', 'point_estimates', sprintf("point_estimate_%04d_%04d_%04d", iter, m, uniform_cluster_size))
-  save(point_estimate, file = sprintf("%s.RData", filename_save))
+  filename_save <- file.path('SIMULATION', 'intermediate_results', 'poisson', 'point_estimates', sprintf("point_estimate_%04d_%04d_%04d", iter, m, uniform_cluster_size))
+  remote_save(point_estimate, key = filename_save)
 
   interval_estimate <- list(sim = if(!is.null(confint.result.sim)){confint.result.sim} else{matrix(NA, nrow = 8, ncol = 2)},
                            ps2 = if(!is.null(confint.result.ps2)){confint.result.ps2} else{matrix(NA, nrow = 8, ncol = 2)},
                            ps3 = if(!is.null(confint.result.ps3)){confint.result.ps3} else{matrix(NA, nrow = 8, ncol = 2)},
                            ps4 = if(!is.null(confint.result.ps4)){confint.result.ps4} else{matrix(NA, nrow = 8, ncol = 2)}
                            )
-  filename_save <- file.path(getwd(), 'SIMULATION', 'intermediate_results', 'poisson', 'interval_estimates', sprintf("interval_estimate_%04d_%04d_%04d", iter, m, uniform_cluster_size))
-  save(interval_estimate, file = sprintf("%s.RData", filename_save))
+  filename_save <- file.path('SIMULATION', 'intermediate_results', 'poisson', 'interval_estimates', sprintf("interval_estimate_%04d_%04d_%04d", iter, m, uniform_cluster_size))
+  remote_save(interval_estimate, key = filename_save)
 })

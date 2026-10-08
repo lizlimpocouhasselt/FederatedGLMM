@@ -6,6 +6,7 @@
 
 # Load libraries / functions
 library(fastDummies)
+source(file.path('R_common', 'remote_store.R'))
 source(file.path('DEMO', 'scripts_and_functions', 'fn_compute_summary.R'))
 source(file.path('DEMO', 'scripts_and_functions', 'construct_hankel.R')) # Hankel moment matrix (summations)
 
@@ -20,8 +21,8 @@ source(file.path('DEMO', 'scripts_and_functions', 'construct_hankel.R')) # Hanke
 
 sparcs_csv_name <- "Hospital_Inpatient_Discharges__SPARCS_De-Identified___2022_20241021.csv"
 local_csv_path <- file.path("DEMO", sparcs_csv_name)
-default_rclone_remote <- paste0("gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data/DEMO/",
-                                sparcs_csv_name)
+default_rclone_remote <- remote_path(file.path("DEMO", sparcs_csv_name))
+preprocessed_key <- file.path("DEMO", "intermediate_results", "preprocessed_data.csv")
 
 # Source priority: SPARCS_CSV_PATH > local DEMO/<csv> > rclone stream from SPARCS_RCLONE_REMOTE.
 open_sparcs_connection <- function() {
@@ -54,13 +55,10 @@ open_sparcs_connection <- function() {
   pipe(paste("rclone cat", shQuote(remote)), open = "r")
 }
 
-cache_dir <- Sys.getenv("DEMO_CACHE_DIR", unset = file.path("DEMO", "intermediate_results", "cache"))
+cache_dir <- Sys.getenv("DEMO_CACHE_DIR", unset = file.path(tempdir(), "fglmm_demo_cache"))
 dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
 
-summary_dir <- file.path("DEMO", "intermediate_results", "summary_info")
-dir.create(summary_dir, recursive = TRUE, showWarnings = FALSE)
-
-preprocessed_csv <- file.path("DEMO", "intermediate_results", "preprocessed_data.csv")
+preprocessed_csv <- preprocessed_key
 
 normalize_header_name <- function(x) {
   tolower(gsub("[^A-Za-z0-9]+", "", x))
@@ -94,8 +92,9 @@ compute_and_save_summary <- function(grp, grp_num) {
     summary_info <- list(fn_compute_summary(grp[, -1, drop = FALSE], num.varnames))
   }
 
-  save(summary_info,
-       file = file.path(summary_dir, sprintf("summary_info_%04d.RData", grp_num)))
+  remote_save(summary_info,
+              key = file.path("DEMO", "intermediate_results", "summary_info",
+                              sprintf("summary_info_%04d.RData", grp_num)))
 }
 
 build_preprocessed_csv <- function(chunk_lines = 100000L) {
@@ -181,23 +180,28 @@ build_preprocessed_csv <- function(chunk_lines = 100000L) {
               if (file.exists(filtered_csv)) format(file.info(filtered_csv)$size, big.mark = ",") else "missing"))
   keep_facilities <- names(which(table(filtered_dt$Facility.Name) > 1L))
   filtered_dt <- filtered_dt[filtered_dt$Facility.Name %in% keep_facilities, , drop = FALSE]
-  write.csv(filtered_dt, file = preprocessed_csv, row.names = FALSE)
-  cat(sprintf("DEBUG: wrote preprocessed_data.csv -> rows=%d, cols=%d\n",
+  tmp_csv <- tempfile(fileext = ".csv")
+  write.csv(filtered_dt, file = tmp_csv, row.names = FALSE)
+  upload_file(tmp_csv, preprocessed_key)
+  if (file.exists(filtered_csv)) {
+    file.remove(filtered_csv)
+  }
+  cat(sprintf("DEBUG: uploaded preprocessed_data.csv -> rows=%d, cols=%d\n",
               nrow(filtered_dt), ncol(filtered_dt)))
 
-  invisible(preprocessed_csv)
+  invisible(preprocessed_key)
 }
 
-if (file.exists(preprocessed_csv) && Sys.getenv("DEMO_REBUILD", unset = "") != "1") {
-  cat(sprintf("DEBUG: loading existing preprocessed csv at %s\n", preprocessed_csv))
-  dt <- data.table::fread(preprocessed_csv, header = TRUE, showProgress = FALSE,
-                          stringsAsFactors = FALSE)
+if (Sys.getenv("DEMO_REBUILD", unset = "") != "1" && remote_exists(preprocessed_key)) {
+  cat(sprintf("DEBUG: loading existing preprocessed csv from remote key %s\n", preprocessed_key))
+  dt <- remote_fread(preprocessed_key, header = TRUE, showProgress = FALSE,
+                     stringsAsFactors = FALSE)
 } else {
   cat("DEBUG: building preprocessed csv from raw SPARCS file\n")
   build_preprocessed_csv()
-  cat(sprintf("DEBUG: finished build_preprocessed_csv(); reading %s\n", preprocessed_csv))
-  dt <- data.table::fread(preprocessed_csv, header = TRUE, showProgress = FALSE,
-                          stringsAsFactors = FALSE)
+  cat(sprintf("DEBUG: finished build_preprocessed_csv(); reading remote key %s\n", preprocessed_key))
+  dt <- remote_fread(preprocessed_key, header = TRUE, showProgress = FALSE,
+                     stringsAsFactors = FALSE)
 }
 
 facility_names <- sort(unique(dt$Facility.Name))
