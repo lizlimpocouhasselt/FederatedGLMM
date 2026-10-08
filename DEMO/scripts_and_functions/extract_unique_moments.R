@@ -41,7 +41,7 @@ extract_unique_moments <- function(H) {
   lt.idx <- lower.tri(H[ab_idx, ab_idx], diag = T) 
   df <- data.frame(values = H[ab_idx, ab_idx][lt.idx],
                     mom.names = (outer(rownames(H)[ab_idx], rownames(H)[ab_idx], FUN = paste))[lt.idx])
-  var.comp <- sapply(rownames(H)[a_idx], grepl, df$mom.names, fixed = T)
+  var.comp <- matrix(sapply(rownames(H)[a_idx], grepl, df$mom.names, fixed = T), nrow = nrow(df))
   if(length(rownames(H)[a_idx]) > 3){
     idx <- (!duplicated(apply(var.comp, 1, paste, collapse = ' '))) +
      (rowSums(var.comp) < 4)
