@@ -14,4 +14,4 @@ source(file.path(getwd(),'SIMULATION', 'scripts', 'obj.R'))
 source(file.path(getwd(),'R_common', 'mvrnorm2.R'))
 source(file.path(getwd(),'SIMULATION', 'scripts', 'fn_pseudodata.R'))
 
-run_pseudodata(moment = 4, input_suffix = '_x4_x5', output_suffix = '_x4_x5')
+run_pseudodata(moment = 4, input_suffix = '_x4_x5', output_suffix = '_x4_x5', max_iter = 200)

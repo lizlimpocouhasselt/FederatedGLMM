@@ -2,28 +2,28 @@
 # SIMULATION: GENERALIZED LINEAR MIXED MODEL - LOG LINK (POISSON)
 #------------------------------------------------------------------
 
-# Empty the environment
-rm(list=ls(all=TRUE)) 
+rm(list = ls(all = TRUE))
 
-# Call functions
-source(file.path('R_common', 'remote_store.R'))
-source(file.path('SIMULATION', 'scripts', 'fn_simdata.R'))
+source(file.path(getwd(), 'R_common', 'remote_store.R'))
+source(file.path(getwd(), 'SIMULATION', 'scripts', 'fn_run_rows.R'))
+source(file.path(getwd(), 'SIMULATION', 'scripts', 'fn_simdata.R'))
 
-# Set parameters based on real SPARCS dataset
-x_pars <- list(x1_norm_mean = 3150.149,
-               x1_norm_sd = 843.0881,
-               x2_p = 0.5602384,
-               x3_multinom_p = c(0.09535973, 0.1272882, 0.1111111, 0.3865475, 0.2796935)
-               )
+x_pars <- list(
+  x1_norm_mean = 3150.149,
+  x1_norm_sd = 843.0881,
+  x2_p = 0.5602384,
+  x3_multinom_p = c(0.09535973, 0.1272882, 0.1111111, 0.3865475, 0.2796935)
+)
 
-par_settings <- read.csv(file.path('SIMULATION', 'par_settings.csv'))
-
-lapply(1:nrow(par_settings), function(row){
-    iter <- par_settings$iter[row]
-    m <- par_settings$m[row]
-    uniform_cluster_size <- par_settings$uniform_cluster_size[row]
-    seed <- par_settings$seed[row]
-    simdata <- fn_simdata_glmm(iter, m, uniform_cluster_size, seed, x_pars) 
-    filename_save <- file.path('SIMULATION', 'intermediate_results', 'poisson', 'simdata', sprintf("simdata_%04d_%04d_%04d", iter, m, uniform_cluster_size))
-    remote_save(simdata, key = filename_save)
-})
+run_by_row(
+  step = 'simdata',
+  inputs = list(),
+  outputs = list(
+    simdata = list(dir = 'simdata', prefix = 'simdata')
+  ),
+  worker = function(row, env) {
+    simdata <- fn_simdata_glmm(row$iter, row$m, row$uniform_cluster_size, row$seed, x_pars)
+    env$simdata <- simdata
+    list(simdata = simdata)
+  }
+)

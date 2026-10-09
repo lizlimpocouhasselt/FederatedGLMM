@@ -118,8 +118,18 @@ Run SIMULATION pipeline with remote `.RData` I/O:
 ```bash
 cd Codes_and_Data
 export FGLMM_RCLONE_ROOT='gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data'
+export FGLMM_CORES=4
+export SIM_ROWS='1:3'
+export SIM_REBUILD=0
 Rscript SIMULATION/steps/run_pipeline.R
 ```
+
+The simulation helpers honor the following environment variables:
+
+- `FGLMM_RCLONE_ROOT`: remote root used for all Drive-backed generated objects.
+- `FGLMM_CORES`: worker count used for per-row `mclapply` batches; on Windows it is forced to `1`.
+- `SIM_ROWS`: optional row subset in CSV row-number or range form, such as `1:5` or `1,3,5`.
+- `SIM_REBUILD=1`: forces the step to ignore existing Drive outputs and regenerate them.
 
 Check remote outputs after a run:
 
@@ -153,6 +163,15 @@ Run in this order:
 4. `SIMULATION/steps/estimates.R`
 5. `SIMULATION/steps/preds.R`
 
+Optional x4_x5 variant (appended after the baseline steps):
+
+1. `SIMULATION/steps/simdata_x4_x5.R`
+2. `SIMULATION/steps/compute_summary_x4_x5.R`
+3. `SIMULATION/steps/pseudodata_2ndmom_x4_x5.R`, `SIMULATION/steps/pseudodata_3rdmom_x4_x5.R`, `SIMULATION/steps/pseudodata_4thmom_x4_x5.R`
+4. `SIMULATION/steps/aic.R`
+
+`SIMULATION/steps/aic.R` is intentionally restricted to the first 200 iterations per setting (`iter <= 200`) for the x4_x5 model-selection output.
+
 ```bash
 Rscript SIMULATION/steps/simdata.R
 Rscript SIMULATION/steps/compute_summary.R
@@ -161,6 +180,25 @@ Rscript SIMULATION/steps/pseudodata_3rdmom.R
 Rscript SIMULATION/steps/pseudodata_4thmom.R
 Rscript SIMULATION/steps/estimates.R
 Rscript SIMULATION/steps/preds.R
+
+# x4_x5 variant + AIC model selection (200 iterations per setting)
+Rscript SIMULATION/steps/simdata_x4_x5.R
+Rscript SIMULATION/steps/compute_summary_x4_x5.R
+Rscript SIMULATION/steps/pseudodata_2ndmom_x4_x5.R
+Rscript SIMULATION/steps/pseudodata_3rdmom_x4_x5.R
+Rscript SIMULATION/steps/pseudodata_4thmom_x4_x5.R
+Rscript SIMULATION/steps/aic.R
+```
+
+### Figures
+
+Figure scripts pull `point_estimates/`, `interval_estimates/`, and `preds/` from `SIMULATION/intermediate_results/poisson/` on Drive into a temporary directory and upload the rendered figures to `Figures/outputs/poisson/` on Drive (`FGLMM_RCLONE_ROOT` applies). The local `Figures/outputs/` folder is not written.
+
+```bash
+Rscript Figures/scripts_and_functions/figure_bias_distribution.R
+Rscript Figures/scripts_and_functions/figure_confint.R
+Rscript Figures/scripts_and_functions/figure_coverage.R
+Rscript Figures/scripts_and_functions/figure_preds.R
 ```
 
 ## Environment management
@@ -183,6 +221,8 @@ Rscript SIMULATION/steps/run_pipeline.R
 Rscript SIMULATION/steps/run_pipeline.R --include-x4-x5
 Rscript SIMULATION/steps/run_pipeline.R --dry-run --include-x4-x5
 ```
+
+When `--include-x4-x5` is used, `run_pipeline.R` appends the x4_x5 steps including `aic.R`; the AIC step still evaluates only the first 200 iterations per setting.
 
 ## Sync Hygiene
 

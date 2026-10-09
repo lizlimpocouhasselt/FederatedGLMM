@@ -34,6 +34,7 @@ fn_simdata_glmm <- function(iter, m, uniform_cluster_size, seed, x_pars, include
     if (isTRUE(include_x4_x5)) {
       simdata$x4 <- rnorm(length(x1))
       simdata$x5 <- rbinom(length(x1), 1, 0.3)
+      simdata <- simdata[, c("x1", "x2", "x3", "x4", "x5", "y", "g")]
     }
   # while(sum(unlist(lapply(1:m, function(j){
   #   length(unique(simdata$x3[simdata$g==j])) != 5

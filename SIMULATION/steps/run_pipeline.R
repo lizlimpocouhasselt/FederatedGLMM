@@ -11,7 +11,7 @@ for (arg in args) {
       "Usage: Rscript SIMULATION/steps/run_pipeline.R [--include-x4-x5] [--dry-run]",
       "",
       "Runs the SIMULATION pipeline in order.",
-      "--include-x4-x5 adds the x4_x5 variant after the default baseline steps.",
+      "--include-x4-x5 adds the x4_x5 variant, including its AIC step, after the default baseline steps.",
       "--dry-run prints the planned step order without executing anything."
     ))
     quit(status = 0)
@@ -45,7 +45,8 @@ x4_x5_steps <- c(
   "compute_summary_x4_x5.R",
   "pseudodata_2ndmom_x4_x5.R",
   "pseudodata_3rdmom_x4_x5.R",
-  "pseudodata_4thmom_x4_x5.R"
+  "pseudodata_4thmom_x4_x5.R",
+  "aic.R"
 )
 
 steps <- base_steps
@@ -61,7 +62,7 @@ if (dry_run) {
 for (step in steps) {
   script_path <- file.path(project_root, "SIMULATION", "steps", step)
   message("\n=== Running: ", step, " ===")
-  status <- system2("Rscript", script_path)
+  status <- system2("Rscript", shQuote(script_path))
   if (status != 0L) {
     stop(sprintf("Pipeline failed while running '%s' (exit code %s).", step, status))
   }
