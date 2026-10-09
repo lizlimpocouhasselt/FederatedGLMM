@@ -8,6 +8,7 @@ library(cowplot)
 library(reshape2)
 library(ggrastr)
 source(file.path(getwd(), "Figures", "scripts_and_functions", "fn_figure_io.R"))
+fig_log("starting figure_preds.R")
 
 # Tabulate settings
 settings <- data.frame(setting = 1:3,
@@ -20,11 +21,16 @@ nsim <- 500
 #---------------
 # Plot predictions
 family = "poisson"
+fig_log("building prediction plots for family=%s (settings=%d, nsim=%d)", family, nrow(settings), nsim)
 local_root <- fig_pull_inputs(c(preds = "preds"), family, settings, nsim)
 preds_plots <- lapply(1:nrow(settings), function(setting) {
   m <- settings$m[setting]
   uniform_cluster_size <- settings$uniform_cluster_size[setting]
+  fig_log("prediction plot %d/%d: m=%d n=%d", setting, nrow(settings), m, uniform_cluster_size)
   preds.ls <- lapply(1:nsim, function(iter) {
+    if (iter %% 100 == 0 || iter == nsim) {
+      fig_log("  loading preds iter %d/%d for m=%d n=%d", iter, nsim, m, uniform_cluster_size)
+    }
     load(file.path(local_root, "preds",
                    sprintf("preds_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
     poi.predictions
@@ -39,25 +45,31 @@ preds_plots <- lapply(1:nrow(settings), function(setting) {
     rasterise(geom_point(shape = 1, alpha = 1), dpi = 300) +
     geom_abline(intercept = 0, color = "red") +
     ggtitle(paste0("m = ", m, ", n = ", uniform_cluster_size)) +
-    theme(plot.title = element_text(hjust = 0.5, size = 16), # Title size
-          
-          # --- AXES TEXT ---
-          axis.title.y = element_text(size = 14),            # Y-axis label size (e.g., "bias")
-          axis.text.x = element_text(size = 12),             # X-axis tick labels (your beta/sigma expressions)
-          axis.text.y = element_text(size = 12),             # Y-axis tick labels
-          
-          # --- LEGEND TEXT ---
-          legend.title = element_text(size = 14),            # Legend title size (e.g., "dat")
-          legend.text = element_text(size = 12))
+    # PDF is drawn at its printed size (full text width), so sizes are final pt
+    theme(plot.title = element_text(hjust = 0.5, size = 11),
+          axis.title.x = element_text(size = 10),
+          axis.title.y = element_text(size = 10),
+          axis.text.x = element_text(size = 9),
+          axis.text.y = element_text(size = 9),
+          legend.title = element_text(size = 10),
+          legend.text = element_text(size = 9),
+          legend.position = "none")
 })
+preds_legend <- get_legend(preds_plots[[1]] +
+                             guides(color = guide_legend(override.aes = list(size = 2))) +
+                             theme(legend.position = "bottom"))
 
-# postscript(fig_output_file("fig_preds.eps"), onefile = F)
+# pdf(fig_output_file("fig_preds.pdf"), onefile = F)
 # print(plot_grid(plotlist = preds_plots, ncol = 1, byrow = F))
 # dev.off()
-# fig_upload(fig_output_file("fig_preds.eps"), family)
+# fig_upload(fig_output_file("fig_preds.pdf"), family)
 
-pdf(fig_output_file("fig_preds.pdf"), onefile = F)
-print(plot_grid(plotlist = preds_plots, ncol = 1, byrow = F))
+fig_log("writing fig_preds.pdf")
+pdf(fig_output_file("fig_preds.pdf", family), width = 6.3, height = 7,
+    paper = "special", onefile = F)
+print(plot_grid(plot_grid(plotlist = preds_plots, ncol = 1, align = "v"),
+                preds_legend, ncol = 1, rel_heights = c(1, 0.05)))
 dev.off()
-fig_upload(fig_output_file("fig_preds.pdf"), family)
+fig_upload(fig_output_file("fig_preds.pdf", family), family)
 unlink(local_root, recursive = TRUE, force = TRUE)
+fig_log("completed figure_preds.R")

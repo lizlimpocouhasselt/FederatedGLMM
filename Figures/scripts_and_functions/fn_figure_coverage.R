@@ -14,8 +14,19 @@
 #---------------------------------------------------------------
 
 fn_coverage <- function(nsim, m, uniform_cluster_size, parnum, lookup_df, family, local_root){
+  .log <- if (exists("fig_log", mode = "function")) {
+    get("fig_log", mode = "function")
+  } else {
+    function(fmt, ...) message(sprintf(paste0("[figures] ", fmt), ...))
+  }
+
   sapply(c('sim', 'ps2', 'ps3', 'ps4'), function(data.type){
+    .log("fn_coverage start: par=%d m=%d n=%d type=%s", parnum, m, uniform_cluster_size, data.type)
     mean(sapply(1:nsim, function(iter){
+      if (iter %% 100 == 0 || iter == nsim) {
+        .log("fn_coverage progress: par=%d m=%d n=%d type=%s iter=%d/%d",
+             parnum, m, uniform_cluster_size, data.type, iter, nsim)
+      }
       file <- file.path(local_root, "interval_estimates",
                         sprintf("interval_estimate_%04d_%04d_%04d.RData",
                                 iter, m, uniform_cluster_size))

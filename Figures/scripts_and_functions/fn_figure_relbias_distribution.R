@@ -11,8 +11,19 @@
 #---------------------------------------------------------------
 
 fn_relbias <- function(nsim, m, uniform_cluster_size, family, local_root){
+  .log <- if (exists("fig_log", mode = "function")) {
+    get("fig_log", mode = "function")
+  } else {
+    function(fmt, ...) message(sprintf(paste0("[figures] ", fmt), ...))
+  }
+
   bias.ls <- lapply(c('sim', 'ps2', 'ps3', 'ps4'), function(data.type){
+    .log("fn_relbias start: m=%d n=%d type=%s", m, uniform_cluster_size, data.type)
     mat <- t(sapply(1:nsim, function(iter){
+      if (iter %% 100 == 0 || iter == nsim) {
+        .log("fn_relbias progress: m=%d n=%d type=%s iter=%d/%d",
+             m, uniform_cluster_size, data.type, iter, nsim)
+      }
       file <- file.path(local_root, "point_estimates",
                         sprintf("point_estimate_%04d_%04d_%04d.RData",
                                 iter, m, uniform_cluster_size))
@@ -24,6 +35,7 @@ fn_relbias <- function(nsim, m, uniform_cluster_size, family, local_root){
     df <- as.data.frame(mat)
     df$dat <- rep(data.type, nsim)
     df$iter <- 1:nsim
+    .log("fn_relbias done: m=%d n=%d type=%s", m, uniform_cluster_size, data.type)
     df
   })
   bias.wide <- do.call(rbind, bias.ls)
