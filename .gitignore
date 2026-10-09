@@ -6,6 +6,8 @@ dist/
 *.Rhistory
 *.RData
 *.rds
+*.eps
+*.pdf
 
 # Ignore the specific large files
 DEMO/intermediate_results/preprocessed_data.csv
