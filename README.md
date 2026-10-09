@@ -192,7 +192,7 @@ Rscript SIMULATION/steps/aic.R
 
 ### Figures
 
-Figure scripts pull `point_estimates/`, `interval_estimates/`, and `preds/` from `SIMULATION/intermediate_results/poisson/` on Drive into a temporary directory and upload the rendered figures to `Figures/outputs/poisson/` on Drive (`FGLMM_RCLONE_ROOT` applies). The local `Figures/outputs/` folder is not written.
+Figure scripts pull `point_estimates/`, `interval_estimates/`, and `preds/` from `SIMULATION/intermediate_results/poisson/` on Drive into a temporary directory and save the rendered figures directly to the workspace at `Figures/outputs/poisson/`.
 
 ```bash
 Rscript Figures/scripts_and_functions/figure_bias_distribution.R
