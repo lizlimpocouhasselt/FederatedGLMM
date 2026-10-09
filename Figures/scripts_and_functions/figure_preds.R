@@ -7,6 +7,7 @@ library(ggplot2)
 library(cowplot)
 library(reshape2)
 library(ggrastr)
+source(file.path(getwd(), "Figures", "scripts_and_functions", "fn_figure_io.R"))
 
 # Tabulate settings
 settings <- data.frame(setting = 1:3,
@@ -19,12 +20,13 @@ nsim <- 500
 #---------------
 # Plot predictions
 family = "poisson"
+local_root <- fig_pull_inputs(c(preds = "preds"), family, settings, nsim)
 preds_plots <- lapply(1:nrow(settings), function(setting) {
   m <- settings$m[setting]
   uniform_cluster_size <- settings$uniform_cluster_size[setting]
   preds.ls <- lapply(1:nsim, function(iter) {
-    load(sprintf(file.path("SIMULATION", "intermediate_results", family,
-                           "preds", "preds_%04d_%04d_%04d.RData"), iter, m, uniform_cluster_size))
+    load(file.path(local_root, "preds",
+                   sprintf("preds_%04d_%04d_%04d.RData", iter, m, uniform_cluster_size)))
     poi.predictions
   })
   preds.df <- as.data.frame(do.call(rbind, preds.ls))
@@ -49,10 +51,13 @@ preds_plots <- lapply(1:nrow(settings), function(setting) {
           legend.text = element_text(size = 12))
 })
 
-# postscript(file.path("Figures", "outputs", "poisson", "fig_preds.eps"), onefile = F)
-# plot_grid(plotlist = preds_plots, ncol = 1, byrow = F)
+# postscript(fig_output_file("fig_preds.eps"), onefile = F)
+# print(plot_grid(plotlist = preds_plots, ncol = 1, byrow = F))
 # dev.off()
+# fig_upload(fig_output_file("fig_preds.eps"), family)
 
-pdf(file.path("Figures", "outputs", "poisson", "fig_preds.pdf"), onefile = F)
-plot_grid(plotlist = preds_plots, ncol = 1, byrow = F)
+pdf(fig_output_file("fig_preds.pdf"), onefile = F)
+print(plot_grid(plotlist = preds_plots, ncol = 1, byrow = F))
 dev.off()
+fig_upload(fig_output_file("fig_preds.pdf"), family)
+unlink(local_root, recursive = TRUE, force = TRUE)

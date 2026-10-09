@@ -5,22 +5,21 @@
 #   m : number of clusters
 #   uniform_cluster_size : cluster size
 #   parnum : nth parameter
+#   local_root : local directory of inputs pulled from Drive (fig_pull_inputs)
 #
 # OUTPUT: 
 #   long dataframe consisting of point and interval estimates
 #---------------------------------------------------------------
 
-fn_confint <- function(nsim, m, uniform_cluster_size, parnum, family){
+fn_confint <- function(nsim, m, uniform_cluster_size, parnum, family, local_root){
     ci.ls <- lapply(c('sim', 'ps2', 'ps3', 'ps4'), function(data.type){
               mat <- t(sapply(1:nsim, function(iter){
-                      file.pt = sprintf(file.path(getwd(), "SIMULATION", "intermediate_results", 
-                                               family, "point_estimates",
-                                               "point_estimate_%04d_%04d_%04d.RData"),
-                                     iter, m, uniform_cluster_size)
-                      file.int = sprintf(file.path(getwd(), "SIMULATION", "intermediate_results", 
-                                                   family, "interval_estimates",
-                                                   "interval_estimate_%04d_%04d_%04d.RData"),
-                                         iter, m, uniform_cluster_size)
+                      file.pt = file.path(local_root, "point_estimates",
+                                          sprintf("point_estimate_%04d_%04d_%04d.RData",
+                                                  iter, m, uniform_cluster_size))
+                      file.int = file.path(local_root, "interval_estimates",
+                                           sprintf("interval_estimate_%04d_%04d_%04d.RData",
+                                                   iter, m, uniform_cluster_size))
                       if(file.exists(file.pt) & file.exists(file.int)){
                         load(file.pt)
                         load(file.int)

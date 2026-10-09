@@ -7,6 +7,7 @@ library(ggplot2)
 library(cowplot)
 
 # Call function
+source(file.path(getwd(), "Figures", "scripts_and_functions", "fn_figure_io.R"))
 source(file.path(getwd(), "Figures", "scripts_and_functions", "fn_figure_confint.R"))
 
 # Tabulate settings
@@ -34,11 +35,14 @@ lookup_df <- data.frame(num = 1:8,
                                       expression(beta[34]),
                                       expression(beta[35]))),
                         true = c(0.4811, 2.285513, -0.302612, 0.087566, -0.959036, -0.812642, -0.809044, -0.794925))
+local_root <- fig_pull_inputs(c(point_estimates = "point_estimate",
+                                interval_estimates = "interval_estimate"),
+                              family, settings, nsim)
 ci_allpars <- lapply(1:nrow(lookup_df), function(parnum){
   ci_plots <- lapply(1:nrow(settings), function(setting){
     m <- settings$m[setting]
     uniform_cluster_size <- settings$uniform_cluster_size[setting]
-    ci.df <- fn_confint(nsim, m, uniform_cluster_size, parnum, family)
+    ci.df <- fn_confint(nsim, m, uniform_cluster_size, parnum, family, local_root)
     ci.df$iter <- rep(1:nsim, 4)
     parname <- lookup_df$name[match(parnum, lookup_df$num)]
     partrue <- lookup_df$true[match(parnum, lookup_df$num)]
@@ -70,9 +74,13 @@ ci_allpars <- lapply(1:nrow(lookup_df), function(parnum){
 })
 
 # For clearer plots in the paper, we produced the plots in three (3) parts
-postscript(file.path("Figures", "outputs", family, "fig_ci_all_1.eps"), onefile = F)
-plot_grid(plotlist = ci_allpars[1:4], ncol = 1)
-postscript(file.path("Figures", "outputs", family, "fig_ci_all_2.eps"), onefile = F)
-plot_grid(plotlist = ci_allpars[5:8], ncol = 1)
+postscript(fig_output_file("fig_ci_all_1.eps"), onefile = F)
+print(plot_grid(plotlist = ci_allpars[1:4], ncol = 1))
 dev.off()
+fig_upload(fig_output_file("fig_ci_all_1.eps"), family)
+postscript(fig_output_file("fig_ci_all_2.eps"), onefile = F)
+print(plot_grid(plotlist = ci_allpars[5:8], ncol = 1))
+dev.off()
+fig_upload(fig_output_file("fig_ci_all_2.eps"), family)
+unlink(local_root, recursive = TRUE, force = TRUE)
 

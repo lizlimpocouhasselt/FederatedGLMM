@@ -6,6 +6,7 @@ library(ggplot2)
 library(cowplot)
 
 # Call function
+source(file.path(getwd(), "Figures", "scripts_and_functions", "fn_figure_io.R"))
 source(file.path(getwd(), "Figures", "scripts_and_functions", "fn_figure_coverage.R"))
 
 # Tabulate settings
@@ -38,13 +39,14 @@ lookup_df <- data.frame(num = 1:8,
                         true = c(0.4811, 2.285513, -0.302612, 0.087566, -0.959036, -0.812642, -0.809044, -0.794925))
 
 # Compute coverage and plot them
+local_root <- fig_pull_inputs(c(interval_estimates = "interval_estimate"), family, settings, nsim)
 coverage.all <- lapply(1:nrow(lookup_df), function(parnum){
   coverage.ls <- lapply(1:nrow(settings), function(setting){
     m <- settings$m[setting]
     uniform_cluster_size <- settings$uniform_cluster_size[setting]
     df <- data.frame(
       coverage = 100 *
-        fn_coverage(nsim, m, uniform_cluster_size, parnum, lookup_df, family),
+        fn_coverage(nsim, m, uniform_cluster_size, parnum, lookup_df, family, local_root),
       setting = rep(paste("m =", m,", n =", uniform_cluster_size), 4))
     df$type = row.names(df); row.names(df) <- NULL
     print(df)
@@ -76,6 +78,8 @@ legend <- get_legend(coverage.all[[1]] + theme(legend.position = "right"))
 coverage.all <- lapply(coverage.all, function(plot) plot +
                          theme(legend.position = "none"))
 pg.par <- plot_grid(plotlist = coverage.all, ncol = 2)
-postscript(file.path("Figures", "outputs", family, "fig_coverage.eps"))
-plot_grid(pg.par, legend, rel_widths = c(1, 0.075))
+postscript(fig_output_file("fig_coverage.eps"))
+print(plot_grid(pg.par, legend, rel_widths = c(1, 0.075)))
 dev.off()
+fig_upload(fig_output_file("fig_coverage.eps"), family)
+unlink(local_root, recursive = TRUE, force = TRUE)

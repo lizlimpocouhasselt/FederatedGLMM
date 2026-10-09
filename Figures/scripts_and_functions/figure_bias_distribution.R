@@ -8,6 +8,7 @@ library(ggplot2)
 library(cowplot)
 
 # Call function/s
+source(file.path(getwd(), "Figures", "scripts_and_functions", "fn_figure_io.R"))
 source(file.path(getwd(), "Figures", "scripts_and_functions", "fn_figure_bias_distribution.R"))
 source(file.path(getwd(), "Figures", "scripts_and_functions", "fn_figure_relbias_distribution.R"))
 
@@ -24,10 +25,11 @@ betas <- c('b0', 'b1', 'b2', 'b32', 'b33')
 # Plot biases
 family <- "poisson"
 betas <- if(family == "logit") betas else c(betas, 'b34', 'b35')
+local_root <- fig_pull_inputs(c(point_estimates = "point_estimate"), family, settings, nsim)
 bias_plots <- lapply(1:nrow(settings), function(setting){
   m <- settings$m[setting]
   uniform_cluster_size <- settings$uniform_cluster_size[setting]
-  bias.df <- fn_bias(nsim, m, uniform_cluster_size, family)
+  bias.df <- fn_bias(nsim, m, uniform_cluster_size, family, local_root)
   ggplot(bias.df, aes(x = factor(pars, levels = c(betas,
                                                   "sig.u")), 
                       y = bias, fill = dat)) + 
@@ -52,14 +54,15 @@ bias_plots <- lapply(1:nrow(settings), function(setting){
           legend.text = element_text(size = 12)              # Legend item labels size)
     )
 })
-postscript(file.path("Figures", "outputs", family, "fig_bias.eps"), onefile = F)
-plot_grid(plotlist = bias_plots, ncol = 1)
+postscript(fig_output_file("fig_bias.eps"), onefile = F)
+print(plot_grid(plotlist = bias_plots, ncol = 1))
 dev.off()
+fig_upload(fig_output_file("fig_bias.eps"), family)
 
 relbias_plots <- lapply(1:nrow(settings), function(setting){
   m <- settings$m[setting]
   uniform_cluster_size <- settings$uniform_cluster_size[setting]
-  bias.df <- fn_relbias(nsim, m, uniform_cluster_size, family)
+  bias.df <- fn_relbias(nsim, m, uniform_cluster_size, family, local_root)
   ggplot(bias.df, aes(x = factor(pars, levels = c(betas,
                                                   "sig.u")), 
                       y = bias, fill = dat)) + 
@@ -84,6 +87,8 @@ relbias_plots <- lapply(1:nrow(settings), function(setting){
           legend.text = element_text(size = 12)              # Legend item labels size)
     )
 })
-postscript(file.path("Figures", "outputs", family, "fig_relbias.eps"), onefile = F)
-plot_grid(plotlist = relbias_plots, ncol = 1)
+postscript(fig_output_file("fig_relbias.eps"), onefile = F)
+print(plot_grid(plotlist = relbias_plots, ncol = 1))
 dev.off()
+fig_upload(fig_output_file("fig_relbias.eps"), family)
+unlink(local_root, recursive = TRUE, force = TRUE)

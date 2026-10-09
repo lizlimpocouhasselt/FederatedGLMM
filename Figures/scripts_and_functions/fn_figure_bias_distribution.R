@@ -4,18 +4,18 @@
 #   nsim : number of simulations
 #   m : number of clusters
 #   uniform_cluster_size : cluster size
+#   local_root : local directory of inputs pulled from Drive (fig_pull_inputs)
 #
 # OUTPUT: 
 #   long dataframe ready for creating boxplots
 #---------------------------------------------------------------
 
-fn_bias <- function(nsim, m, uniform_cluster_size, family){
+fn_bias <- function(nsim, m, uniform_cluster_size, family, local_root){
     bias.ls <- lapply(c('sim', 'ps2', 'ps3', 'ps4'), function(data.type){
               mat <- t(sapply(1:nsim, function(iter){
-                      file <- sprintf(file.path("SIMULATION", "intermediate_results", 
-                                            family, "point_estimates",
-                                      "point_estimate_%04d_%04d_%04d.RData"),
-                                   iter, m, uniform_cluster_size)
+                      file <- file.path(local_root, "point_estimates",
+                                        sprintf("point_estimate_%04d_%04d_%04d.RData",
+                                                iter, m, uniform_cluster_size))
                       if(file.exists(file)){
                         load(file) 
                         return(point_estimate[, data.type] - point_estimate[, 'true'])
