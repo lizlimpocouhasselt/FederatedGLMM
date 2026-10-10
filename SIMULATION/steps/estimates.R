@@ -39,10 +39,10 @@ run_by_row(
     mod.result.ps3 <- glmer(y ~ scale(x1) + x2 + x32 + x33 + x34 + x35 + (1|g), pseudodata_3rdmom, family = soft_poisson)
     mod.result.ps4 <- glmer(y ~ scale(x1) + x2 + x32 + x33 + x34 + x35 + (1|g), pseudodata_4thmom, family = soft_poisson)
 
-    confint.result.sim <- confint(mod.result.sim)
-    confint.result.ps2 <- confint(mod.result.ps2)
-    confint.result.ps3 <- confint(mod.result.ps3)
-    confint.result.ps4 <- confint(mod.result.ps4)
+    confint.result.sim <- confint(mod.result.sim, method = "Wald")
+    confint.result.ps2 <- confint(mod.result.ps2, method = "Wald")
+    confint.result.ps3 <- confint(mod.result.ps3, method = "Wald")
+    confint.result.ps4 <- confint(mod.result.ps4, method = "Wald")
 
     point_estimate <- data.frame(
       true = c(0.4811, 2.285513, -0.302612, 0.087566, -0.959036, -0.812642, -0.809044, -0.794925),
