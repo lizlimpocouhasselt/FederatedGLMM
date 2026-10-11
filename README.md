@@ -67,11 +67,10 @@ The local `DEMO/intermediate_results` and `SIMULATION/intermediate_results` dire
 These examples show how to run scripts that read/write data on Google Drive through `rclone` and `R_common/remote_store.R`.
 
 1. Set the remote root once per shell session.
-2. Run scripts from `Codes_and_Data` so relative `source()` paths resolve.
+2. Run commands from the repository root so relative `source()` paths resolve.
 3. Use helper checks to confirm remote inputs/outputs exist.
 
 ```bash
-cd Codes_and_Data
 export FGLMM_RCLONE_ROOT='gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data'
 ```
 
@@ -85,7 +84,6 @@ Rscript -e "source('R_common/remote_store.R'); print(length(remote_list('DEMO/in
 Run DEMO with Drive-backed SPARCS streaming (default behavior when no local CSV is set):
 
 ```bash
-cd Codes_and_Data
 export FGLMM_RCLONE_ROOT='gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data'
 unset SPARCS_CSV_PATH
 unset SPARCS_RCLONE_REMOTE
@@ -97,7 +95,6 @@ Rscript DEMO/scripts_and_functions/da_est.R
 Force a full rebuild of `preprocessed_data.csv` from Drive (ignore existing remote cache):
 
 ```bash
-cd Codes_and_Data
 export FGLMM_RCLONE_ROOT='gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data'
 export DEMO_REBUILD=1
 Rscript DEMO/scripts_and_functions/data_provider.R
@@ -107,7 +104,6 @@ unset DEMO_REBUILD
 Override the Drive CSV location explicitly (for a non-default remote path):
 
 ```bash
-cd Codes_and_Data
 export FGLMM_RCLONE_ROOT='gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data'
 export SPARCS_RCLONE_REMOTE='gdrive:PhD/Working papers/Federated GLMM/alternate_path/Hospital_Inpatient_Discharges__SPARCS_De-Identified___2022_20241021.csv'
 Rscript DEMO/scripts_and_functions/data_provider.R
@@ -116,7 +112,6 @@ Rscript DEMO/scripts_and_functions/data_provider.R
 Run SIMULATION pipeline with remote `.RData` I/O:
 
 ```bash
-cd Codes_and_Data
 export FGLMM_RCLONE_ROOT='gdrive:PhD/Working papers/Federated GLMM/Codes_and_Data'
 export FGLMM_CORES=4
 export SIM_ROWS='1:3'
@@ -206,7 +201,6 @@ Rscript Figures/scripts_and_functions/figure_preds.R
 This project uses `renv` for a reproducible R library. The package list in `R_packages.txt` is the source manifest; use the lockfile for restores and updates.
 
 ```bash
-cd Codes_and_Data
 Rscript -e 'renv::restore()'
 Rscript -e 'renv::snapshot(type = "all", prompt = FALSE)'
 ```
@@ -216,7 +210,6 @@ Rscript -e 'renv::snapshot(type = "all", prompt = FALSE)'
 The full SIMULATION pipeline can be run from a single entry point. The baseline pipeline runs by default, and the x4_x5 variant can be added with a toggle.
 
 ```bash
-cd Codes_and_Data
 Rscript SIMULATION/steps/run_pipeline.R
 Rscript SIMULATION/steps/run_pipeline.R --include-x4-x5
 Rscript SIMULATION/steps/run_pipeline.R --dry-run --include-x4-x5
